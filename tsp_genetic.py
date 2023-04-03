@@ -106,16 +106,16 @@ class GeneticAlgorithm:
                 return pop[c]
         return pop[-1]
 
-
     def crossover(self, pop, returnTwo = True): # 교배
+        # https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=cni1577&logNo=221237605486 참고
         father = self.select(pop)
         mother = self.select(pop)
-        cross1, cross2 = sorted(rd.sample(range(len(pop[0]) + 1), 2)) # 0 ~ SIZE 중 무작위로 2개선택
+        cross1, cross2 = sorted(rd.sample(range(len(father) + 1), 2)) # 0 ~ SIZE 중 무작위로 2개선택
         fMid = father[cross1:cross2] # 교환 구역
         mMid = mother[cross1:cross2]
 
-        visitf = [False] * len(pop[0]) # 도시 중복 방문 방지용 체크배열
-        visitm = [False] * len(pop[0])
+        visitf = [False] * len(father) # 도시 중복 방문 방지용 체크배열
+        visitm = [False] * len(mother)
         for i in fMid:
             visitf[i] = True
         for i in mMid:
@@ -123,7 +123,7 @@ class GeneticAlgorithm:
 
         child1 = []
         child2 = []
-        for i in range(len(pop[0])):
+        for i in range(len(father)):
             if len(child1) == cross1: # 교환 구역 시작점에 오면 교환 구역 추가
                 child1 += mMid
             if len(child2) == cross1:
@@ -210,7 +210,7 @@ def main(): # 메인함수
         ga.mutate(population) # 돌연변이 연산 수행
         population.sortPop()
 
-        if generation % 10 == 0 and not map.updateUI(cityMap, generation, ga.bestGene): # 100번마다 UI 업데이트
+        if generation % 10 == 0 and not map.updateUI(cityMap, generation, ga.bestGene): # 10번마다 UI 업데이트
             break
         
         ga.getProgress(population) # 차트를 위해 평균 적합도, 최적 적합도 추이 반영

@@ -1,16 +1,20 @@
 import numpy as np
 import csv
-import tsp_genetic
+import copy
 
+adjCities = None
 cities = []
-sol = []
+dist = None
 
 def distance(x, y):
     dist = np.linalg.norm(np.array(x) - np.array(y))
     return dist
 
 def getDistanceList(): # 도시간 거리 2차원 테이블 반환
-    global dist
+    global dist, cities
+    if dist != None:
+        return dist
+    
     dist = [[None] * len(cities) for _ in range(len(cities))]
     for i in range(len(cities)):
         for j in range(len(cities)):
@@ -20,20 +24,24 @@ def getDistanceList(): # 도시간 거리 2차원 테이블 반환
 def getCities(): # 도시들의 좌표 반환
     return cities
 
-with open('example_solution.csv', mode='r', newline='') as solution:
+def getSortedAdjacentCities(): # 정렬된 인접도시 2차원 리스트 반환
+    global dist, adjCities     # adjCities[3][5] = 3번 도시에서 5번째로 가까운 도시
+    if adjCities != None:       # adjCities[1][0] = 1번 도시에서 0번째로 가까운 도시 = 자기자신인 1번
+        return adjCities
 
-    reader = csv.reader(solution)
-    for row in reader:
-        sol.append(int(row[0]))
-    
-    idx = sol.index(0)
+    if dist == None:
+        getDistanceList()
 
-    front = sol[idx:]
-    back = sol[0:idx]
+    adjCities = copy.deepcopy(dist) # 각 거리에 도시 인덱스 정보도 추가해 정렬하여
+    for i in range(len(adjCities)): # 가까운 순으로 정렬된 도시 번호 얻기
+        for j in range(len(adjCities)):
+            adjCities[i][j] = [adjCities[i][j], j] #
+        adjCities[i].sort()
 
-    sol = front + back
-    
-    sol.append(int(0))
+    for i in range(len(adjCities)):
+        for j in range(len(adjCities)):
+            adjCities[i][j] = adjCities[i][j][1]
+    return adjCities
 
 with open('2023_AI_TSP.csv', mode='r', newline='', encoding='utf-8-sig') as tsp:
     reader = csv.reader(tsp)
@@ -41,3 +49,5 @@ with open('2023_AI_TSP.csv', mode='r', newline='', encoding='utf-8-sig') as tsp:
         cities.append(list(map(float, row)))
 
 print("data loading..")
+getDistanceList()
+getSortedAdjacentCities()
