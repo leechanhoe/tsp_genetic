@@ -11,13 +11,13 @@ distance = [] # 장소간 거리 2차원 테이블
 
 class Chromosome: # 염색체 
     def __init__(self, size, g=None):
-# genes = 1차원 배열[0,1,2,3,4,5,6,7,8] = 방문 순서 -> 0~8 순서로 순회하고 0으로 돌아옴
+# genes = 1차원 배열[0,1,2....998,999] = 방문 순서 -> 0~999 순서로 순회하고 0으로 돌아온다는 뜻
         self.genes = None
         self.fitness = 0
 
         if g == None:
             self.genes = [*range(size)]
-            rd.shuffle(self.genes) # [1,2,3,4,5,6,7,8]을 무작위로 순서변경
+            rd.shuffle(self.genes) # 무작위로 순서변경
         else:
             self.genes = g.copy()
 
@@ -95,7 +95,7 @@ class GeneticAlgorithm:
     
     def select(self, pop): # 부모 선택
         # 적합도에 비례해 선택하면 안좋은 개체를 선택할 확률이 너무 높으므로 좋은 염색체를 남길 확률 더 증가
-        # 2 ** i 면 제일 좋은 것이 확률 1/2 -> [1/2, 1/4, 1/8, 1/16 ...]
+        # 2 ** i 면 제일 좋은 것이 확률 1/2 -> [1/2, 1/4, 1/8, 1/16...]
         pro = [1.4 ** i for i in range(POP_SIZE - 1, -1, -1)]
         pick = rd.uniform(0, sum(pro))
         current = 0
