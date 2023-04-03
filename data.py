@@ -9,7 +9,7 @@ def distance(x, y):
     dist = np.linalg.norm(np.array(x) - np.array(y))
     return dist
 
-def getDistanceList():
+def getDistanceList(): # 도시간 거리 2차원 테이블 반환
     global dist
     dist = [[None] * len(cities) for _ in range(len(cities))]
     for i in range(len(cities)):
@@ -17,7 +17,7 @@ def getDistanceList():
             dist[i][j] = distance([cities[i][0], cities[i][1]], [cities[j][0], cities[j][1]])
     return dist
 
-def getCities():
+def getCities(): # 도시들의 좌표 반환
     return cities
 
 with open('example_solution.csv', mode='r', newline='') as solution:
@@ -40,16 +40,4 @@ with open('2023_AI_TSP.csv', mode='r', newline='', encoding='utf-8-sig') as tsp:
     for row in reader:
         cities.append(list(map(float, row)))
 
-
-total_cost = 0
-
-for idx in range(len(sol)-1):
-
-    pos_city_1 = [cities[sol[idx]][0], cities[sol[idx]][1]]
-    pos_city_2 = [cities[sol[idx+1]][0], cities[sol[idx+1]][1]]
-
-    dist = distance(pos_city_1, pos_city_2)
-
-    total_cost += dist
-
-print('final cost: ' + str(total_cost))
+print("data loading..")

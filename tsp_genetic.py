@@ -114,7 +114,7 @@ class GeneticAlgorithm:
         fMid = father[cross1:cross2] # 교환 구역
         mMid = mother[cross1:cross2]
 
-        visitf = [False] * len(pop[0])
+        visitf = [False] * len(pop[0]) # 도시 중복 방문 방지용 체크배열
         visitm = [False] * len(pop[0])
         for i in fMid:
             visitf[i] = True
@@ -182,16 +182,16 @@ class GeneticAlgorithm:
 
 def main(): # 메인함수
     global distance
-    distance = data.getDistanceList()
+    distance = data.getDistanceList() # 도시간 거리 2차원 테이블 가져오기
     cityNum = len(distance)
-    start = time.time()
+    start = time.time() # 실행시간 측정
 
-    population = Population(POP_SIZE, cityNum)
+    population = Population(POP_SIZE, cityNum) # 무작위로 한 세대 생성
     population.sortPop()
-    cityMap = map.loadMap()
+    cityMap = map.loadMap() # 시각화 이미지 로드
 
     generation = 0
-    ga = GeneticAlgorithm(population)
+    ga = GeneticAlgorithm(population) # 유전 알고리즘 인스턴스 생성
     while 1:
         generation += 1
         
