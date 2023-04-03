@@ -210,7 +210,7 @@ def main(): # 메인함수
         ga.mutate(population) # 돌연변이 연산 수행
         population.sortPop()
 
-        if generation % 100 == 0 and not map.updateUI(cityMap, generation, ga.bestGene): # 100번마다 UI 업데이트
+        if generation % 10 == 0 and not map.updateUI(cityMap, generation, ga.bestGene): # 100번마다 UI 업데이트
             break
         
         ga.getProgress(population) # 차트를 위해 평균 적합도, 최적 적합도 추이 반영
