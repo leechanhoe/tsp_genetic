@@ -36,7 +36,7 @@ def updateUI(prevMap, generation, bestGene): # UI 갱신
     global cities
     cityMap = prevMap.copy()
 
-    for i in range(1, len(bestGene)): # 장소들을 잇는 선 그리기
+    for i in range(len(bestGene)): # 장소들을 잇는 선 그리기
         cv2.line(cityMap,
             pt1=(cities[bestGene[i-1]][0], cities[bestGene[i-1]][1]),
             pt2=(cities[bestGene[i]][0], cities[bestGene[i]][1]),

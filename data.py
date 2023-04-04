@@ -49,5 +49,3 @@ with open('2023_AI_TSP.csv', mode='r', newline='', encoding='utf-8-sig') as tsp:
         cities.append(list(map(float, row)))
 
 print("data loading..")
-getDistanceList()
-getSortedAdjacentCities()

@@ -4,10 +4,11 @@ import map
 import data
 import time
 
-MAX_ITER = 1000 # 최대 반복
+MAX_ITER = 10000 # 최대 반복
 POP_SIZE = 30 # 한 세대당 염색체 개수
 MUT_RATE = 0.13 # 돌연변이 확률
 distance = [] # 장소간 거리 2차원 테이블
+SortedAdjCities = [] # 서로 가까운 순으로 정렬된 장소간 거리 -> [1][5] = 1번 도시에서 5번째로 가까운 도시, [i][0] = 0
 
 class Chromosome: # 염색체 
     def __init__(self, size, g=None):
@@ -95,13 +96,31 @@ class GeneticAlgorithm:
         # 적합도에 비례해 선택하면 안좋은 개체를 선택할 확률이 너무 높으므로 좋은 염색체를 남길 확률 더 증가
         # 2 ** i 면 제일 좋은 것이 확률 1/2 -> [1/2, 1/4, 1/8, 1/16...]
         return rd.choices(pop, weights= [1.4 ** i for i in range(POP_SIZE - 1, -1, -1)])[0]
+    
+    def huristic(self, start, size):
+        global SortedAdjCities
+        route = []
+        visited = [False] * len(SortedAdjCities)
+        visited[start] = True
 
+        now = start
+        for _ in range(size):
+            for city in SortedAdjCities[now]:
+                if not visited[city] and rd.random() < 0.5:
+                    route.append(city)
+                    visited[city] = True
+                    now = city
+                    break
+        return route
+    
     def crossover(self, pop, returnTwo = True): # 교배
         # https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=cni1577&logNo=221237605486 참고
         father = self.select(pop)
         mother = self.select(pop)
-        cross1, cross2 = sorted(rd.sample(range(len(father) + 1), 2)) # 0 ~ SIZE 중 무작위로 2개선택
-        fMid = father[cross1:cross2] # 교환 구역
+
+        cross1 = rd.randrange(len(father) - 2)
+        cross2 = rd.randrange(cross1 + 2, min(cross1 + 50, len(father)))
+        fMid = self.huristic(father[cross1], cross2 - cross1) # 교환 구역을 휴리스틱으로 정하기
         mMid = mother[cross1:cross2]
 
         visitf = [False] * len(father) # 도시 중복 방문 방지용 체크배열
@@ -170,8 +189,9 @@ class GeneticAlgorithm:
         print("최적의 거리 :", self.bestGene.getFitness())
 
 def main(): # 메인함수
-    global distance
+    global distance, SortedAdjCities
     distance = data.getDistanceList() # 도시간 거리 2차원 테이블 가져오기
+    SortedAdjCities = data.getSortedAdjacentCities()
     cityNum = len(distance)
     start = time.time() # 실행시간 측정
 
