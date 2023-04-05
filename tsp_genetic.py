@@ -49,9 +49,8 @@ class Chromosome: # 염색체
     def calFitness(self): # 적합도 계산
         self.fitness = 0
         
-        for i in range(len(self) - 1): # 중간 도시들 적합도 더하기
-            self.fitness += distance[self[i]][self[i+1]]
-        self.fitness += distance[self[0]][self[-1]]
+        for i in range(len(self)): # 중간 도시들 적합도 더하기
+            self.fitness += distance[self[i]][self[i-1]]
         return self.fitness
 
 class Population: # 한 세대(염색체들을 가지고있음)
@@ -169,6 +168,15 @@ class GeneticAlgorithm:
         chart.drawChart(self.fitnessMean, self.fitnessBest, generation, self.bestGene, self.worstGene)
         print("최적의 거리 :", self.bestGene.getFitness())
 
+    def saveSolution(self): # 파일에 최적 경로를 저장하는 함수
+        f = open("route.csv", "w")
+        startCityIdx = self.bestGene.getGene().index(0) # 0번 도시의 인덱스 -> 0번 도시를 시작과 끝에 놓기 위해
+        route = self.bestGene.getGene()[startCityIdx:] + self.bestGene.getGene()[:startCityIdx]
+        for city in route:
+            f.write(str(city)+'\n')
+        f.close()
+        print("최적 경로가 route.csv 파일에 저장되었습니다.")
+
 def main(): # 메인함수
     global distance
     distance = data.getDistanceList() # 도시간 거리 2차원 테이블 가져오기
@@ -206,8 +214,8 @@ def main(): # 메인함수
 
     t = time.time() - start
     print(f"실행시간 : {int(t//60)}분 {t%60}초")
-
     ga.drawResultChart(generation) # 마지막으로 차트 그리기
+    ga.saveSolution()
     # main함수 끝
 
 if __name__ == '__main__':

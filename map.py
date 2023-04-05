@@ -1,5 +1,6 @@
 import cv2
 import data
+import copy
 
 cities = []
 IMG_HEIGHT = 600

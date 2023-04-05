@@ -4,9 +4,10 @@ import map
 import data
 import time
 
-MAX_ITER = 10000 # 최대 반복
+MAX_ITER = 100000 # 최대 반복
 POP_SIZE = 30 # 한 세대당 염색체 개수
 MUT_RATE = 0.13 # 돌연변이 확률
+NEAR_WEIGHT = 0.5 # 휴리스틱 함수의 가중치 (ctr버튼을 누른상태에서 NEAR_WEIGHT를 클릭하면 자세한 설명이 나옵니다)
 distance = [] # 장소간 거리 2차원 테이블
 SortedAdjCities = [] # 서로 가까운 순으로 정렬된 장소간 거리 -> [1][5] = 1번 도시에서 5번째로 가까운 도시, [i][0] = 0
 
@@ -20,6 +21,8 @@ class Chromosome: # 염색체
             self.genes = [*range(size)]
             rd.shuffle(self.genes) # 무작위로 순서변경
         else:
+            if(len(g) != 1000):
+                print("누락됨")
             self.genes = g.copy()
 
         self.calFitness()
@@ -49,10 +52,8 @@ class Chromosome: # 염색체
 
     def calFitness(self): # 적합도 계산
         self.fitness = 0
-        
-        for i in range(len(self) - 1): # 중간 도시들 적합도 더하기
-            self.fitness += distance[self[i]][self[i+1]]
-        self.fitness += distance[self[0]][self[-1]]
+        for i in range(len(self)): # 중간 도시들 적합도 더하기
+            self.fitness += distance[self.genes[i]][self.genes[i-1]]
         return self.fitness
 
 class Population: # 한 세대(염색체들을 가지고있음)
@@ -97,21 +98,21 @@ class GeneticAlgorithm:
         # 2 ** i 면 제일 좋은 것이 확률 1/2 -> [1/2, 1/4, 1/8, 1/16...]
         return rd.choices(pop, weights= [1.4 ** i for i in range(POP_SIZE - 1, -1, -1)])[0]
     
-    def huristic(self, start, size):
+    def huristic(self, start, size): # 한 시작도시에서 가까운 도시들 위주로 size(2~50) 크기의 부분경로를 생성
         global SortedAdjCities
         route = []
         visited = [False] * len(SortedAdjCities)
         visited[start] = True
 
         now = start
-        for _ in range(size):
-            for city in SortedAdjCities[now]:
-                if not visited[city] and rd.random() < 0.5:
-                    route.append(city)
+        for _ in range(size): #  항상 가까운 도시만 방문하면 항상 같은 경로를 반환하기 때문에 국소최적해에 빠질 수 있으니
+            for city in SortedAdjCities[now]: # 좀 더 먼곳도 탐색할 수 있도록 하되 가까운 곳에 가중치를 더 둠
+                if not visited[city] and rd.random() < NEAR_WEIGHT: # NEAR_WEIGHT가 0.5면 가장 가까운 도시의 확률 = 0.5
+                    route.append(city)                              # 2번째로 가까운 도시 확률 = 0.25, 3번쨰는 = 0.125
                     visited[city] = True
                     now = city
                     break
-        return route
+        return route # 가까운 도시들 위주로 구성된 부분경로 반환
     
     def crossover(self, pop, returnTwo = True): # 교배
         # https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=cni1577&logNo=221237605486 참고
@@ -120,7 +121,7 @@ class GeneticAlgorithm:
 
         cross1 = rd.randrange(len(father) - 2)
         cross2 = rd.randrange(cross1 + 2, min(cross1 + 50, len(father)))
-        fMid = self.huristic(father[cross1], cross2 - cross1) # 교환 구역을 휴리스틱으로 정하기
+        fMid = self.huristic(father[cross1], cross2 - cross1) # 휴리스틱함수로 교환 구역 생성
         mMid = mother[cross1:cross2]
 
         visitf = [False] * len(father) # 도시 중복 방문 방지용 체크배열
@@ -184,9 +185,18 @@ class GeneticAlgorithm:
     def getWorstGene(self):
         return self.worstGene
 
-    def drawResultChart(self, generation):
+    def drawResultChart(self, generation): # 차트를 그리는 함수
         chart.drawChart(self.fitnessMean, self.fitnessBest, generation, self.bestGene, self.worstGene)
         print("최적의 거리 :", self.bestGene.getFitness())
+
+    def saveSolution(self): # 파일에 최적 경로를 저장하는 함수
+        f = open("route.csv", "w")
+        startCityIdx = self.bestGene.getGene().index(0) # 0번 도시의 인덱스
+        route = self.bestGene.getGene()[startCityIdx:] + self.bestGene.getGene()[:startCityIdx]
+        for city in route:
+            f.write(str(city)+'\n')
+        f.close()
+        print("최적 경로가 route.csv 파일에 저장되었습니다.")
 
 def main(): # 메인함수
     global distance, SortedAdjCities
@@ -226,8 +236,8 @@ def main(): # 메인함수
 
     t = time.time() - start
     print(f"실행시간 : {int(t//60)}분 {t%60}초")
-
     ga.drawResultChart(generation) # 마지막으로 차트 그리기
+    ga.saveSolution()
     # main함수 끝
 
 if __name__ == '__main__':
