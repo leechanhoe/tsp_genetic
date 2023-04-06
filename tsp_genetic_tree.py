@@ -21,8 +21,6 @@ class Chromosome: # 염색체
             self.genes = [*range(size)]
             rd.shuffle(self.genes) # 무작위로 순서변경
         else:
-            if(len(g) != 1000):
-                print("누락됨")
             self.genes = g.copy()
 
         self.calFitness()
@@ -52,7 +50,7 @@ class Chromosome: # 염색체
 
     def calFitness(self): # 적합도 계산
         self.fitness = 0
-        for i in range(len(self)): # 중간 도시들 적합도 더하기
+        for i in range(len(self)): # 도시들간 거리 더하기
             self.fitness += distance[self.genes[i]][self.genes[i-1]]
         return self.fitness
 
@@ -75,18 +73,10 @@ class Population: # 한 세대(염색체들을 가지고있음)
     def __setitem__(self, key, value):
         self.pop[key] = value
 
-    def __repr__(self): # 출력
-        ret = ""
-        print(len(self.pop))
-        for i, chro in enumerate(self.pop):
-            ret += f"염색체 # {i} = {chro} 적합도 = {chro.getFitness()}\n"
-        return ret + '\n'
-
     def sortPop(self):
         self.pop.sort(key = lambda x: x.getFitness())
 
 class GeneticAlgorithm:
-
     def __init__(self, pop):
         self.fitnessMean = [] # 평균 적합도 추이
         self.fitnessBest = [] # 첫번째 염색체의 적합도 추이
@@ -231,7 +221,7 @@ def main(): # 메인함수
 
         if generation % 10 == 0 and not map.updateUI(cityMap, generation, ga.bestGene): # 10번마다 UI 업데이트
             break
-        
+
         ga.getProgress(population) # 차트를 위해 평균 적합도, 최적 적합도 추이 반영
 
     t = time.time() - start
