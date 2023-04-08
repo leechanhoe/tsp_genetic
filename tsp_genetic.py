@@ -13,7 +13,7 @@ class Chromosome: # 염색체
     def __init__(self, size, g=None):
 # genes = 1차원 배열[0,1,2....998,999] = 방문 순서 -> 0~999 순서로 순회하고 0으로 돌아온다는 뜻
         self.genes = None
-        self.fitness = 0
+        self.fitness = 0 # 적합도 = 거리 총합
 
         if g == None:
             self.genes = [*range(size)]
@@ -49,7 +49,7 @@ class Chromosome: # 염색체
     def calFitness(self): # 적합도 계산
         self.fitness = 0
         
-        for i in range(len(self)): # 중간 도시들 적합도 더하기
+        for i in range(len(self)): # 도시들간 거리 더하기
             self.fitness += distance[self[i]][self[i-1]]
         return self.fitness
 
@@ -71,13 +71,6 @@ class Population: # 한 세대(염색체들을 가지고있음)
 
     def __setitem__(self, key, value):
         self.pop[key] = value
-
-    def __repr__(self): # 출력
-        ret = ""
-        print(len(self.pop))
-        for i, chro in enumerate(self.pop):
-            ret += f"염색체 # {i} = {chro} 적합도 = {chro.getFitness()}\n"
-        return ret + '\n'
 
     def sortPop(self):
         self.pop.sort(key = lambda x: x.getFitness())
