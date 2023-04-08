@@ -121,7 +121,7 @@ class GeneticAlgorithm:
 
         cross1 = rd.randrange(len(father) - 2)
         cross2 = rd.randrange(cross1 + 2, min(cross1 + 50, len(father)))
-        fMid = self.huristic(father[cross1], cross2 - cross1) # 휴리스틱함수로 교환 구역 생성
+        fMid = self.huristic(father[cross1], cross2 - cross1) # 휴리스틱함수로 크기가 2~50인 교환 구역 생성
         mMid = mother[cross1:cross2]
 
         visitf = [False] * len(father) # 도시 중복 방문 방지용 체크배열
