@@ -5,7 +5,7 @@ import data
 import time
 import additional_algorithm
 
-MAX_ITER = 100000 # 최대 반복
+MAX_ITER = 1000000 # 최대 반복
 POP_SIZE = 30 # 한 세대당 염색체 개수
 MUT_RATE = 0.13 # 돌연변이 확률
 distance = [] # 장소간 거리 2차원 테이블
@@ -14,7 +14,7 @@ class Chromosome: # 염색체
     def __init__(self, size, g=None):
 # genes = 1차원 배열[0,1,2....998,999] = 방문 순서 -> 0~999 순서로 순회하고 0으로 돌아온다는 뜻
         self.genes = None
-        self.fitness = 0
+        self.fitness = 0  # 적합도 = 경로의 거리
 
         if g == None:
             self.genes = [*range(size)]
@@ -77,14 +77,19 @@ class Population: # 한 세대(염색체들을 가지고있음)
 
 class GeneticAlgorithm:
     def __init__(self, pop):
-        self.population = pop
+        self.population = pop # Population
         self.fitnessMean = [] # 평균 적합도 추이
         self.fitnessBest = [] # 첫번째 염색체의 적합도 추이
-        self.bestGene = pop[0]
-        self.worstGene = pop[-1]
+        self.bestGene = pop[0] # 적합도가 제일 좋은 염색체
+        self.worstGene = pop[-1] # 적합도가 제일 나쁜 염색체
+        self.interSectCity = [] # 경로가 교차하는 선을 가지고 있는 점(도시)들
 
     def setPopulation(self, pop):
         self.population = pop
+
+    def getIntersectCities(self):
+        self.interSectCity = additional_algorithm.getIntersectCityIdx(self.bestGene.getGene())
+        print("교차하는 점들", self.interSectCity)
 
     def sortPopulation(self):
         self.population.sortPop()
@@ -100,6 +105,9 @@ class GeneticAlgorithm:
         mother = self.select()
 
         cross1 = rd.randrange(len(father) - 2)
+        if rd.random() < 0.5 and len(self.interSectCity) > 0: # 확률적으로 경로가 교차하는 선을 가지고 있는 점(도시) 선택
+            cross1 = rd.choice(self.interSectCity)
+
         cross2 = rd.randrange(cross1 + 2, min(cross1 + 50, len(father))) # cross1 보다 2 ~ 50 더 큰 수
         fMid = additional_algorithm.huristic(father[cross1], cross2 - cross1, 0.5) # 휴리스틱함수로 크기가 2~50인 교환 구역 생성
         mMid = mother[cross1:cross2]
@@ -137,12 +145,13 @@ class GeneticAlgorithm:
     def mutate(self): # 돌연변이
         for chro in self.population:
             if rd.random() < MUT_RATE:
+                a, b = sorted(rd.sample(range(len(chro)), 2))
+                if rd.random() < 0.5 and len(self.interSectCity) > 0: # 특정 확률로 교차 선들을 가진 점끼리 변경
+                    a, b = sorted(rd.sample(self.interSectCity, 2))
                 if rd.random() < 0.5: # 상호 교환 연산자 - 단순히 두 도시 변경
-                    a, b = rd.sample(range(len(chro)), 2)
                     chro.getGene()[a], chro.getGene()[b] = chro.getGene()[b], chro.getGene()[a]
                     chro.calFitness()
                 else: # 역치 연산자 - 두 점을 선택 후 그 사이의 순서 변경
-                    a, b = sorted(rd.sample(range(len(chro) + 1), 2))
                     if a != 0:
                         chro.setGene(chro[:a] + chro[b-1:a-1:-1] + chro[b:])
                     else:
@@ -172,7 +181,7 @@ class GeneticAlgorithm:
     def saveSolution(self): # 파일에 최적 경로를 저장하는 함수
         f = open("solution_05.csv", "w")
         startCityIdx = self.bestGene.getGene().index(0) # 0번 도시의 인덱스
-        route = self.bestGene.getGene()[startCityIdx:] + self.bestGene.getGene()[:startCityIdx] # 0번 도시를 시작으로
+        route = self.bestGene.getGene()[startCityIdx:] + self.bestGene.getGene()[:startCityIdx]
         for city in route:
             f.write(str(city)+'\n')
         f.close()
@@ -183,12 +192,14 @@ class GeneticAlgorithm:
 def main(): # 메인함수
     global distance, SortedAdjCities
     distance = data.getDistanceList() # 도시간 거리 2차원 테이블 가져오기
-    SortedAdjCities = data.getSortedAdjacentCities()
+    SortedAdjCities = data.getSortedAdjacentCities() # 인접 도시 리스트 가져오기
     cityNum = len(distance) # 도시 개수 (1000개)
 
     population = Population(POP_SIZE, cityNum) # 무작위로 한 세대 생성
+    
     # population[0] = Chromosome(cityNum, data.getSavedData()) # 이전 데이터가 있으면 이어서 하기
     population[0] = Chromosome(cityNum, additional_algorithm.huristic(0, 1000, 1)) # 맨 처음 시작점에서 가까운 곳 먼저 그리디하게 방문하여 거리 줄이고 시작
+
     cityMap = map.loadMap() # 시각화 이미지 로드
 
     generation = 0
@@ -201,6 +212,9 @@ def main(): # 메인함수
         if generation == MAX_ITER: # limit까지 도달할 경우
             ga.getProgress() # 차트를 위해 평균 적합도, 최적 적합도 추이 반영
             break
+
+        if generation % 100 == 1: # 100번마다 교차하는 선들을 가진 점을 탐색
+            ga.getIntersectCities()
     
         new_pop = []
         for _ in range(POP_SIZE // 2): # n/2번 2자식씩 생성하며 교배를 하여 새로운 염색체 생성
@@ -213,6 +227,7 @@ def main(): # 메인함수
         ga.mutate() # 돌연변이 연산 수행
         ga.sortPopulation()
         ga.getProgress() # 차트를 위해 평균 적합도, 최적 적합도 추이 반영
+
         # 10번마다 UI 업데이트
         if generation % 10 == 0 and not map.updateUI(cityMap, generation, ga.bestGene, time.time() - start):
             break
