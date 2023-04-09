@@ -89,7 +89,7 @@ class GeneticAlgorithm:
 
     def getIntersectCities(self):
         self.interSectCity = additional_algorithm.getIntersectCityIdx(self.bestGene.getGene())
-        print("교차하는 점들", self.interSectCity)
+        # print("교차하는 점들", self.interSectCity)
 
     def sortPopulation(self):
         self.population.sortPop()
