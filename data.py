@@ -48,15 +48,4 @@ with open('2023_AI_TSP.csv', mode='r', newline='', encoding='utf-8-sig') as tsp:
     for row in reader:
         cities.append(list(map(float, row)))
 
-def test(sol):
-    total_cost = 0
-    for idx in range(len(sol)):
-        p1 = [cities[sol[idx]][0], cities[sol[idx]][1]]
-        p2 = [cities[sol[idx-1]][0], cities[sol[idx-1]][1]]
-
-        dist = distance(p1, p2)
-
-        total_cost += dist
-    return total_cost
-
 print("data loading..")
