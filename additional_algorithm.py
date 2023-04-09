@@ -13,7 +13,7 @@ def huristic(start, size, pro): # 한 시작도시에서 가까운 도시들 위
     now = start
     for _ in range(1, size): #  항상 가까운 도시만 방문하면 항상 같은 경로를 반환하기 때문에 국소최적해에 빠질 수 있으니
         for city in SortedAdjCities[now]: # 좀 더 먼곳도 탐색할 수 있도록 하되 가까운 곳에 가중치를 더 둠
-            if not visited[city] and rd.random() < pro: # NEAR_WEIGHT가 0.5면 가장 가까운 도시의 확률 = 0.5
+            if not visited[city] and rd.random() < pro: # pro가 0.5면 가장 가까운 도시의 확률 = 0.5
                 route.append(city)                              # 2번째로 가까운 도시 확률 = 0.25, 3번쨰는 = 0.125
                 visited[city] = True
                 now = city
