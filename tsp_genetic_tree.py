@@ -187,9 +187,9 @@ def main(): # 메인함수
     cityNum = len(distance) # 도시 개수 (1000개)
 
     population = Population(POP_SIZE, cityNum) # 무작위로 한 세대 생성
-    # population[0] = Chromosome(cityNum, data.getSavedData()) # 이전 데이터가 있으면 이어서 하기
-    population[0] = Chromosome(cityNum, additional_algorithm.huristic(0, 1000, 1)) # 맨 처음 시작점에서 가까운 곳 먼저 그리디하게 방문하여 거리 줄이고 시작
-    cityMap = map.loadMap() # 시각화 이미지 로드
+
+    # 맨 처음 시작점에서 가까운 곳 먼저 그리디하게 방문하여 거리 줄이고 시작
+    population[0] = Chromosome(cityNum, additional_algorithm.huristic(0, 1000, 1))
 
     generation = 0
     ga = GeneticAlgorithm(population) # 유전 알고리즘 인스턴스 생성

@@ -48,15 +48,6 @@ with open('2023_AI_TSP.csv', mode='r', newline='', encoding='utf-8-sig') as tsp:
     for row in reader:
         cities.append(list(map(float, row)))
 
-savedData = [] # solution 불러오기
-with open('solution_05.csv', mode='r', newline='', encoding='utf-8-sig') as tsp:
-    reader = csv.reader(tsp)
-    for row in reader:
-        savedData.append(int(row[0]))
-
-def getSavedData():
-    return savedData
-
 def test(sol):
     total_cost = 0
     for idx in range(len(sol)):
