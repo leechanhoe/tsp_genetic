@@ -1,5 +1,7 @@
 version1 : tsp_genetic.py 를 실행하면 유전 알고리즘만 적용
+
 version2 : tsp_genetic_tree.py 를 실행하면 유전 알고리즘 + 휴리스틱 알고리즘 적용
+
 version3 : tsp_genetic_intersect.py 를 실행하면 유전 알고리즘 + 업그레이드된 휴리스틱 알고리즘 적용
 
 휴리스틱 알고리즘을 적용하니 성능이 비약적으로 증가하였습니다.
