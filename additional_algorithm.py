@@ -45,6 +45,6 @@ def getIntersectCityIdx(route): # 다른 선과 교차하는 선을 가진 점�
                     if not added[c] and 0 <= c < len(route) - 2: # 1000보다 2 작은 값 반환해야 cross2가 2이상 나올 수 있음
                         idx.append(c)
                         added[c] = True
-            if len(idx) >= 30:
+            if len(idx) >= 10:
                 return idx
     return idx
