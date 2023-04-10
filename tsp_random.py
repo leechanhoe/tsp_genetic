@@ -6,7 +6,6 @@ import time
 
 MAX_ITER = 100000  # 최대 반복
 POP_SIZE = 1  # 한 세대당 염색체 개수
-MUT_RATE = 0.13  # 돌연변이 확률
 distance = []  # 장소간 거리 2차원 테이블
 
 class Chromosome:  # 염색체
@@ -72,10 +71,6 @@ class Population:  # 한 세대(염색체들을 가지고있음)
     def __setitem__(self, key, value):
         self.pop[key] = value
 
-    def sortPop(self):
-        self.pop.sort(key=lambda x: x.getFitness())
-
-
 class GeneticAlgorithm:
     def __init__(self, pop):
         self.population = pop
@@ -86,14 +81,6 @@ class GeneticAlgorithm:
 
     def setPopulation(self, pop):
         self.population = pop
-
-    def sortPopulation(self):
-        self.population.sortPop()
-
-    def select(self):  # 부모 선택
-        # 적합도에 비례해 선택하면 안좋은 개체를 선택할 확률이 너무 높으므로 좋은 염색체를 남길 확률 더 증가
-        # 2 ** i 면 제일 좋은 것이 확률 1/2 -> [1/2, 1/4, 1/8, 1/16...]
-        return rd.choices(self.population, weights=[1.4 ** i for i in range(POP_SIZE - 1, -1, -1)])[0]
 
     def getProgress(self):  # 차트를 위한 추이 반영 - 알고리즘과는 상관없음
         fitnessSum = 0  # 평균을 구하기 위한 합계
@@ -118,16 +105,6 @@ class GeneticAlgorithm:
     def drawResultChart(self, generation):  # 차트를 그리는 함수
         chart.drawChart(self.fitnessMean, self.fitnessBest, generation, self.bestGene, self.worstGene)
 
-    def saveSolution(self):  # 파일에 최적 경로를 저장하는 함수
-        f = open("solution_05.csv", "w")
-        startCityIdx = self.bestGene.getGene().index(0)  # 0번 도시의 인덱스
-        route = self.bestGene.getGene()[startCityIdx:] + self.bestGene.getGene()[:startCityIdx]
-        for city in route:
-            f.write(str(city)+'\n')
-        f.close()
-        print("최적의 거리 :", self.bestGene.getFitness())
-        print("최적 경로가 solution_05.csv 파일에 저장되었습니다.")
-
 
 def main():  # 메인함수
     global distance
@@ -139,7 +116,6 @@ def main():  # 메인함수
 
     generation = 0
     ga = GeneticAlgorithm(population)  # 유전 알고리즘 인스턴스 생성
-    ga.sortPopulation()
     start = time.time()  # 실행시간 측정
     while 1:
         generation += 1
@@ -148,12 +124,9 @@ def main():  # 메인함수
             ga.getProgress()  # 차트를 위해 평균 적합도, 최적 적합도 추이 반영
             break
 
-        new_pop = [Chromosome(cityNum)]
-
         # 기존 집합을 새로운 염색체 집합으로 교체
-        ga.setPopulation(Population(POP_SIZE, cityNum, new_pop))
+        ga.setPopulation(Population(POP_SIZE, cityNum))
 
-        ga.sortPopulation()
         ga.getProgress()  # 차트를 위해 평균 적합도, 최적 적합도 추이 반영
 
         # 10번마다 UI 업데이트
@@ -163,7 +136,6 @@ def main():  # 메인함수
     t = time.time() - start
     print(f"실행시간 : {int(t//60)}분 {t%60}초")
     ga.drawResultChart(generation)  # 마지막으로 차트 그리기
-    ga.saveSolution()
     # main함수 끝
 
 if __name__ == '__main__':

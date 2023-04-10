@@ -198,7 +198,7 @@ def main(): # 메인함수
     population = Population(POP_SIZE, cityNum) # 무작위로 한 세대 생성
     
     # 맨 처음 시작점에서 가까운 곳 먼저 그리디하게 방문하여 거리 줄이고 시작
-    population = Population(POP_SIZE, cityNum, [Chromosome(cityNum, additional_algorithm.huristic(0, 1000, 1)) for _ in range(POP_SIZE)])
+    # population = Population(POP_SIZE, cityNum, [Chromosome(cityNum, additional_algorithm.huristic(0, 1000, 1)) for _ in range(POP_SIZE)])
 
     cityMap = map.loadMap() # 시각화 이미지 로드
 
