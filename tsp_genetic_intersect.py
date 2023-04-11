@@ -109,7 +109,7 @@ class GeneticAlgorithm:
             cross1 = rd.choice(self.interSectCity)
 
         cross2 = rd.randrange(cross1 + 2, min(cross1 + 50, len(father))) # cross1 보다 2 ~ 50 더 큰 수
-        fMid = additional_algorithm.huristic(father[cross1], cross2 - cross1, 0.5) # 휴리스틱함수로 크기가 2~50인 교환 구역 생성
+        fMid = additional_algorithm.greedyDfs(father[cross1], cross2 - cross1, 0.5) # 휴리스틱함수로 크기가 2~50인 교환 구역 생성
         mMid = mother[cross1:cross2]
 
         visitf = [False] * len(father) # 도시 중복 방문 방지용 체크배열
@@ -204,7 +204,7 @@ def main(): # 메인함수
 
     generation = 0
     ga = GeneticAlgorithm(population) # 유전 알고리즘 인스턴스 생성
-    ga.sortPopulation()
+    ga.sortPopulation() # 적합도 순으로 정렬
     start = time.time() # 실행시간 측정
     while 1:
         generation += 1

@@ -2,9 +2,9 @@ import data
 import random as rd
 
 cities_x_y = data.getCities() # 장소간 거리 2차원 테이블
-SortedAdjCities = data.getSortedAdjacentCities()
+SortedAdjCities = data.getSortedAdjacentCities() # 각 도시에서 가까운 도시 리스트 -> [3][5] 3번 도시에서 5번째로 가까운 도시
 
-def huristic(start, size, pro): # 한 시작도시에서 가까운 도시들 위주로 size(2~50) 크기의 부분경로를 생성
+def greedyDfs(start, size, pro): # 한 시작도시에서 가까운 도시들 위주로 size(2~50) 크기의 부분경로를 생성
     global SortedAdjCities
     route = [start]
     visited = [False] * len(SortedAdjCities)
