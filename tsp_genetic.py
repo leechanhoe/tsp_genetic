@@ -178,7 +178,6 @@ class GeneticAlgorithm:
         for city in route:
             f.write(str(city)+'\n')
         f.close()
-        print("최적의 거리 :", self.bestGene.getFitness())
         print("최적 경로가 solution_05.csv 파일에 저장되었습니다.")
 
 
@@ -221,6 +220,7 @@ def main():  # 메인함수
     t = time.time() - start
     print(f"실행시간 : {int(t//60)}분 {t%60}초")
     ga.drawResultChart(generation)  # 마지막으로 차트 그리기
+    print("최적의 거리 :", ga.getBestGene().getFitness())
     # ga.saveSolution()
     # main함수 끝
 

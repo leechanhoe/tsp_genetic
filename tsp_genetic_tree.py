@@ -221,7 +221,7 @@ def main(): # 메인함수
     t = time.time() - start
     print(f"실행시간 : {int(t//60)}분 {t%60}초")
     ga.drawResultChart(generation) # 마지막으로 차트 그리기
-    ga.saveSolution()
+    # ga.saveSolution()
     # main함수 끝
 
 if __name__ == '__main__':
