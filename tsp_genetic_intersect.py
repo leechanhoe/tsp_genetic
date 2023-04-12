@@ -89,7 +89,6 @@ class GeneticAlgorithm:
 
     def getIntersectCities(self):
         self.interSectCity = additional_algorithm.getIntersectCityIdx(self.bestGene.getGene())
-        # print("교차하는 점들", self.interSectCity)
 
     def sortPopulation(self):
         self.population.sortPop()
@@ -196,9 +195,6 @@ def main(): # 메인함수
     cityNum = len(distance) # 도시 개수 (1000개)
 
     population = Population(POP_SIZE, cityNum) # 무작위로 한 세대 생성
-    
-    # 맨 처음 시작점에서 가까운 곳 먼저 그리디하게 방문하여 거리 줄이고 시작
-    # population = Population(POP_SIZE, cityNum, [Chromosome(cityNum, additional_algorithm.huristic(0, 1000, 1)) for _ in range(POP_SIZE)])
 
     cityMap = map.loadMap() # 시각화 이미지 로드
 
@@ -235,7 +231,7 @@ def main(): # 메인함수
     t = time.time() - start
     print(f"실행시간 : {int(t//60)}분 {t%60}초")
     ga.drawResultChart(generation) # 마지막으로 차트 그리기
-    ga.saveSolution()
+    # ga.saveSolution() # 파일에 최단거리 저장
     # main함수 끝
 
 if __name__ == '__main__':
